@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Laptop & Diary Aya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #fcfbf4;
+            /* Anti-copy dasar via CSS */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .diary-text {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            white-space: pre-wrap;
+        }
+
+        /* Navigasi Page */
+        .page { 
+            display: none; 
+            height: 100vh; 
+            width: 100vw; 
+            overflow: hidden;
+        }
+        .page.active { 
+            display: flex; 
+        }
+
+        /* Warna Soft */
+        .bg-soft-green { background-color: #e2ede4; }
+        .bg-soft-yellow { background-color: #fef9e7; }
+        .border-soft-green { border-color: #cbdccb; }
+        
+        /* Animasi Tombol Angka */
+        .key-btn:active {
+            transform: scale(0.9);
+            background-color: #d1e7dd;
+        }
+    </style>
+</head>
+<body class="select-none overflow-hidden" oncontextmenu="return false;">
+
+    <div id="app-wrapper" class="w-full h-full flex flex-col">
+
+        <!-- PAGE 1: SMARTPHONE PIN LOCKSCREEN -->
+        <div id="page-pin" class="page active items-center justify-center bg-gradient-to-tr from-[#f6fbf7] to-[#fefcf0] p-4 w-full">
+            <div class="bg-white/80 backdrop-blur-md p-8 rounded-[2.5rem] shadow-2xl border-4 border-[#e2ede4] w-full max-w-sm flex flex-col items-center relative">
+                
+                <!-- Hint Rahasia (Tombol Tanda Tanya di Pojok Kanan Atas) -->
+                <button onclick="toggleHint()" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-sm font-bold text-stone-500 shadow-sm transition">
+                    ❓
+                </button>
+
+                <!-- Lock Icon & Header -->
+                <div class="text-4xl mb-4 animate-bounce">🔐</div>
+                <h2 class="text-2xl font-bold text-[#4c634c] mb-1">Akses Terkunci</h2>
+                <p class="text-xs text-[#738a73] font-medium tracking-wider uppercase mb-4">Masukkan PIN Anda</p>
+                
+                <!-- Pop-up Hint Box (Ditambahkan petunjuk formatnya) -->
+                <div id="hint-box" class="hidden absolute top-16 left-1/2 transform -translate-x-1/2 w-[90%] bg-amber-50 px-4 py-3 rounded-2xl text-xs text-amber-800 font-medium border border-amber-200 shadow-lg text-center z-50">
+                    💡 <span class="italic">Petunjuk Rahasia: "crush aku yang sekarang tapi di balik (format: 4 angka PIN)"</span>
+                </div>
+
+                <!-- PIN Dot Indicators -->
+                <div class="flex justify-center gap-4 mb-6">
+                    <div id="dot-1" class="w-4 h-4 rounded-full border-2 border-[#cbdccb] bg-transparent transition-all duration-150"></div>
+                    <div id="dot-2" class="w-4 h-4 rounded-full border-2 border-[#cbdccb] bg-transparent transition-all duration-150"></div>
+                    <div id="dot-3" class="w-4 h-4 rounded-full border-2 border-[#cbdccb] bg-transparent transition-all duration-150"></div>
+                    <div id="dot-4" class="w-4 h-4 rounded-full border-2 border-[#cbdccb] bg-transparent transition-all duration-150"></div>
+                </div>
+
+                <!-- Error message -->
+                <div id="error-msg" class="text-red-500 font-semibold text-sm mb-4 h-5 opacity-0 transition-opacity duration-200">
+                    ⚠️ PIN Salah, coba lagi!
+                </div>
+
+                <!-- On-Screen Numeric Keypad -->
+                <div class="grid grid-cols-3 gap-3 w-full max-w-[260px] mb-4">
+                    <button onclick="pressNum('1')" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-xl font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">1</button>
+                    <button onclick="pressNum('2')" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-xl font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">2</button>
+                    <button onclick="pressNum('3')" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-xl font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">3</button>
+                    
+                    <button onclick="pressNum('4')" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-xl font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">4</button>
+                    <button onclick="pressNum('5')" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-xl font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">5</button>
+                    <button onclick="pressNum('6')" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-xl font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">6</button>
+                    
+                    <button onclick="pressNum('7')" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-xl font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">7</button>
+                    <button onclick="pressNum('8')" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-xl font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">8</button>
+                    <button onclick="pressNum('9')" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-xl font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">9</button>
+                    
+                    <button onclick="clearPin()" class="key-btn h-14 rounded-full bg-[#fff0f0] text-sm font-bold text-red-500 flex items-center justify-center transition shadow-sm">C</button>
+                    <button onclick="pressNum('0')" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-xl font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">0</button>
+                    <button onclick="backspace()" class="key-btn h-14 rounded-full bg-[#f4f8f4] text-lg font-bold text-[#4c634c] flex items-center justify-center transition shadow-sm">⌫</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 2: INTERACTIVE LAPTOP SIMULATION -->
+        <div id="page-desktop" class="page flex-col bg-[#eef5ef] p-4 relative w-full">
+            <div class="flex-1 w-full bg-[#cbdccb]/40 rounded-3xl border-4 border-[#b5ccb5] p-6 relative overflow-hidden flex flex-col shadow-inner">
+                <div class="absolute inset-0 bg-gradient-to-br from-[#d4e4d4] via-[#f1f6f1] to-[#fbfdfb] opacity-90 z-0"></div>
+                <div class="relative z-10 w-full flex justify-between items-center px-4 py-1 bg-white/40 backdrop-blur-sm rounded-full text-xs text-[#4c634c] font-semibold mb-6 shadow-sm">
+                    <span class="flex items-center gap-1">💻 Laptop_Aya_OS v1.0</span>
+                    <span id="live-clock">12:00 PM</span>
+                </div>
+
+                <!-- Grid Aplikasi -->
+                <div class="relative z-10 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6 flex-1 content-start select-none">
+                    <div onclick="openSystemDialog('Chrome', 'Gagal memuat halaman web. Periksa koneksi internet Anda.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">🌐</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">Browser</span>
+                    </div>
+                    <div onclick="openSystemDialog('Tugas Kuliah', 'Folder Kosong. Belum ada berkas tugas.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">📁</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">Tugas Kuliah</span>
+                    </div>
+                    <div onclick="openSystemDialog('Trash Bin', 'Tempat sampah kosong.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">🗑️</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">Recycle Bin</span>
+                    </div>
+                    <div onclick="openSystemDialog('Galeri Foto', 'Akses Ditolak: Anda tidak memiliki izin.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">📁</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">Foto Kenangan</span>
+                    </div>
+                    <div onclick="openSystemDialog('System Files', 'Peringatan: Merubah folder ini dapat merusak sistem.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">📂</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">System32</span>
+                    </div>
+                    <div onclick="openSystemDialog('Musik', 'Lagu favorit Aya tidak dapat diputar.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">🎵</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">Spotify</span>
+                    </div>
+
+                    <!-- FOLDER RAHASIA -->
+                    <div onclick="openDiary()" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-yellow-100/50 hover:backdrop-blur-sm border-2 border-transparent hover:border-amber-200 transition duration-200 text-center w-24">
+                        <span class="text-4xl mb-1">📁</span>
+                        <span class="text-[11px] font-bold text-amber-900 break-all leading-tight">Secret</span>
+                    </div>
+
+                    <div onclick="openSystemDialog('Catatan Rahasia?', 'Folder ini kosong.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">📁</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">Catatan</span>
+                    </div>
+                    <div onclick="openSystemDialog('Kamera', 'Kesalahan 0x80070005: Kamera tidak terdeteksi.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">📷</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">Kamera</span>
+                    </div>
+                    <div onclick="openSystemDialog('Game Pacman', 'Database permainan sedang offline.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">👾</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">Games</span>
+                    </div>
+                    <div onclick="openSystemDialog('Unduhan', 'Folder ini kosong.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">📁</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">Downloads</span>
+                    </div>
+                    <div onclick="openSystemDialog('Tugas Sekolah', 'Tidak ada berkas di folder ini.')" class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-sm text-center w-24">
+                        <span class="text-4xl mb-1">📂</span>
+                        <span class="text-[11px] font-semibold text-[#3a4d3a] break-all leading-tight">Tugas Sekolah</span>
+                    </div>
+                </div>
+
+                <!-- Custom Mock Dialog Box -->
+                <div id="system-dialog" class="absolute hidden top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[85%] max-w-sm bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border-2 border-stone-200 z-50 overflow-hidden">
+                    <div class="bg-stone-100 px-4 py-2 flex justify-between items-center border-b border-stone-200">
+                        <span id="dialog-title" class="text-xs font-bold text-stone-700">Pemberitahuan Sistem</span>
+                        <button onclick="closeSystemDialog()" class="text-stone-400 hover:text-stone-600 font-bold text-sm">✕</button>
+                    </div>
+                    <div class="p-6">
+                        <p id="dialog-message" class="text-sm text-stone-600 mb-6 leading-relaxed"></p>
+                        <button onclick="closeSystemDialog()" class="w-full py-2 bg-[#5c7a5c] text-white rounded-lg text-sm font-semibold hover:bg-[#4a634a] transition">Tutup</button>
+                    </div>
+                </div>
+
+                <div class="absolute bottom-6 left-6 relative z-10">
+                    <button onclick="lockSystem()" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-700 border border-red-200 text-xs font-bold rounded-full flex items-center gap-1 transition">
+                        🔒 Kunci Laptop
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 3: FULL DIARY READER -->
+        <div id="page-diary" class="page bg-[#fffdf0] overflow-y-auto flex-col items-center p-4 sm:p-8 w-full">
+            <div class="w-full max-w-2xl bg-[#fffcee] rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-[#d1e7dd] flex flex-col relative my-4">
+                <div class="flex justify-between items-center mb-8 pb-4 border-b border-[#cbdccb]/40">
+                    <button onclick="closeDiary()" class="px-4 py-2 bg-[#e2ede4] text-[#4c634c] font-bold text-xs rounded-full hover:bg-[#d5e4d7] transition flex items-center gap-1">
+                        « Kembali ke Desktop
+                    </button>
+                    <span class="text-xs font-bold text-[#738a73] tracking-widest uppercase">My Diary</span>
+                </div>
+
+                <!-- Isi Isi Diary Lengkap -->
+                <div class="diary-text text-[#2c352c] leading-relaxed text-sm sm:text-base tracking-wide text-justify pb-4 space-y-4">
+<p class="font-bold text-lg text-[#3c513c]">Haiii👋</p>
+<p>Yuyur nyesalll billing iya soal ngasih tau ini🥲</p>
+<p>Emm, mulai dari mana ya. Jyujyur bingung 🤪</p>
+<p>Campur-campur ajalah ya</p>
+<p>Kalau soal masalah hidup, masalah hidupku gak selebay itu kok. Kita mulai dari masa kecil aja kali ya ( etdah udah kayak biografi aja lagaknya )</p>
+<p>Masa kecil ku normal  aja kok, tapi ya jarang aja gitu pergi main-main ke rumah teman, sampe makan di rumah teman gak pernah dan gak pernah main  jauh dari pandangan mata emak ku dan kalau mau main agak jauh gitu aku pasti minta tolong ponakan ku yang izinin hehhe kagak berani soalnyaaa. Eh tapi aku pernah boong sekali soal pergi main ni dan berakhir aku yang rugi, ya pokoknya gitulah. Ya itulah sekilas masa kecilku, penurut, gak pernah jadi bokemmm, baikkk😌 hehehe. Tapi banyak kejadian masa kecil yang buat aya besar tumbuh begini.</p>
+<p class="font-bold text-[#3c513c] border-l-4 border-amber-300 pl-3 italic my-4 bg-amber-50 py-2">BEGINI? EMANG KAMU GIMANA?</p>
+<p>Heheh aku gak Gimana-gimana kok aku cuman takut sendirian, takut gak punya teman ,tapi aku takut orang terlalu dekat sama aku dan ngelihat sisi lain dari diriku, trus aku juga paling takut sama  2 kata ini "ditinggalin dan ketinggalan" Trus aku juga takut jadi center di keramaian umum, aku takut terlihat kalau lagi di tranportasi umum (aku juga gak tau kenapa) , trus aku juga takut cuman dianggap remahan biskuit yang  tujuan akhirnya pasti dibuang kan, intinya aku cuman banyak takutnya. Udah kayak lirik lagu aja 😅 dan juga aku punya childhood trauma yang aku juga gak tau aku ngapain waktu kecil sampai tubuh ku ngerespon aneh kebeberapa hal (kayak sesak napas dan gemeteran parah) contohnya belajar bawa motor jujur pas bawa motor itu ya kayak nya orang-orang pada awalnya pasti takut kan itu wajar, tapi kalau aku udah berkali-kali bawa motor tetap aja gemeteran, trus pernah lah rebah sekali gitukan padahal cuman rebah nggak kecelakaan dan rebah nya dirumah kok bukan di jalan raya tapi sesaknya udah kayak orang kecelakaan aja hehhe aku juga gak tau sihh penyebab nya apa, trus kalau aku denger ada hal yang kayak tabrakan gitu lah bunyi nya diluar rumah ku atau mungkin ada rem mendadak kan agak kencang gitu bunyinya entah kenapalah aku pula yang sesak emang aneh ini respon tubuhku hehhehe, sebenarnya ini kayaknya karna waktu aku SD pernah ada orang kecelakan  depan rumahku trus motornya hancur parah sampe beberapa bagian motor nya ada yang terbang ke rumahku dan bunyi kecelakannnya kencang bangett, tapi yang aneh nya kecelakannnya malam hari yang otomatis aku udah tidur aku gk tau soal yang aku dengar bunyi yang kencang itu asli atau cuman mimpi.</p>
+<p>Oh ya soal kata ditinggalin bukan cuman katanya aja ya kejadiannya juga, kok aku takut sih, padahal jaman sekarang udah ada HP atau kita bisa minta tolong kan ke orang tapi tetap aja kepala ku bakalan berisik kalau emak ku udah billing semacam hal yang cuman aku sendiri gitu "besok ke padangnyo surang yo, habis travel naik tp yo, kayak biasonyo" Kalau aku mikirin ini aku selalu takut bakal ditinggalin tp nya atau travel ninggalin aku nanti dijalan, dan banyak lainnya skenario terburuk yang otak ku buat, padahal kan ada HP loh. Tapi setelah ku pikir2 lagi kenapa aku selalu takut dengan "ditinggalin" Itu cuman karna mimpi berulangku waktu SD yang mimpi nya itu aku ditinggal emak ku yang pakai motor perginya terus aku nyusul pake sepeda nah waktu di mimpi itu aku diiringi gitu loh dari belakang sama mamakku pake motor kakak ku digonceng sama mamakku kan trus ada simpang gitu lah mamakku dah belok ke simpang tu yang aku nya nggak bisa belok banyak mobil motor dan aku pake sepeda gak bisa belok nah yang aneh nya emak ku gak balik nemuin aku nya atau nolongin aku buat belok habis itu aku kayak nangis kejer dah mimpinya cuma sampai situ sih, kan kalau mimpinya dibuat lebih panjang trus emak ku bantuin aku belok kan gak bakal jadi trauma tuh. Pokoknya otak aku ini gampang banget mentrauma kan sesuatu traumanya bisa dari yang aku mimpi in atau dari yang aku lihat atau dari yg dengar dan bisa juga dari cerita orang. Kok bisa gitu sih? Aku juga gak tau pastinya, tapi dari hasil searching an ku sih kayaknya aku selalu menjadikan atau aku selalu berpikir "gimana kalau posisi aku yang disana? " Dari sanalah banyak muncul skenario-skenario buruk yang visualnya itu diriku jadi alam bawah sadarku menyimpan semua memori itu dan menjadikan nya trauma, ihiyy keren gak hasil research ku. Oh iya dong by Gemini soalnya hehe. Makanya aku gak suka sebenarnya baca atau nonton film angst, karna ngebahas oy, kayak film yang kita tonton kemaren.</p>
+<p>Trus kenapa dengan "ketinggalan", ketinggalan yang aku maksud disini tu bukan ketinggalan mobil atau yang semacam-macam itulah, yang aku maksud itu adalah aku tertinggal secara prestasi atau kepintarannya dari teman2ku. jujur waktu aku awal2 SMP aku pernah nangis karna ngadapin fakta kalau aku rangking 7, padahal kan masih 10 besar hehhe itu karna masa transisi aku yang waktu SD tu always juara 1 bukan sombong ya ini tu fakta (maaf NPD nya kambuh) dan karna itulah kalau aku takut tertinggal dari orang-orang lain. Tapi lama-lama aku mulai nurunin batas yang aku buat yang waktu kelas 7 aku masih targetin buat juara 1 di kelas2 berikutnya aku targetinnya yang penting masih 10 besar sampai sma akhirnya aku terbiasa untuk gak harus jadi yang terhebat setidak nya bisa ngelakuin semua hal. Tapi rasa takut tertinggal itu tetap ada sampai sma ini, aslinya aku pernah berantem sama jida karna aku pengen banget lebih dari dia di semua pelajaran heheh. Oh iya asli nya aku juga orang nya haus pujian sebenarnya kalau orang yang dekattttt bangettt sama aku bakalan tau sih (aku gak tau kamu tau atau nggak) itu juga karna suatu hal yang terjadi waktu aku SD ☺</p>
+<p>Pokoknya semua yang terjadi sama kita pas dewasa ini terbentuk pas kita kecil kan dan yang sangat-sangat aku sayangkan juga itu aku gak ingat begitu banyak masa kecilku, makanya kalau kalian cerita kalian begini begitu pas kecil aku gak cerita karna aku gak ingatt. Jangankan ingatan pas SD ingatan yang baru terjadi kemaren2 aja udah banyak yang terlupa sama aku. Kasus ini namanya amnesia dissosiatif ya kamu cari ajalah sendiri maksudnya apa. Jadi yang aku ingat itu cuman memory yang melibatkan emosi ku, misalnya kayak aku jatuh di jalan gitu kan disana aku malu makanya aku ingat. Intinya yang ngelibatin segala emosi ku itu bakalan aku ingat, tapi kalau aku pernah janji ke orang atau omongan asal ceplos kalian gak bakalan keingat sama aku karna aku gak ngelibatin emosiku disana. Nah belum tergolong berat kok amnesianya masih ringan dan aku udah tau cara ngatasinnya.</p>
+<p>Pokoknya banyak kejadian lah pas SD atau sebelumnya, makanya pas kamu nanya masa paling menyakitkan itu aku jawab SD, walaupun aku gk begitu ingat sih apa yang ngebuat aku merasa tersakiti begitu, tapi aku percaya apa pun yang terjadi dulu itu pula yang ngebentuk aku yang sekarang, walaupun mungkin lebih banyak nangisnya pas udah gede ini tapi aku ngerasa yg paling sakit itu mungkin pas SD</p>
+<p>Wiih udah banyak banget yang aku ceritain ya 😄 gak nyangka bakalan sepanjang ini hehhee</p>
+<p>Sebenarnya aku mau coba ke psikolog tapi itu gak gampang kan pake duit siapa pula gitu kan kalau pakai duit emak ku ya kagak mungkin lah ntar kata emak ku stress kenapa pula aku dan juga gak bakalan bisa aku ngomong ke orang soal ini (ini ngetik ya bukan ngomong) makanya aku pengen banget bisa kuliah di psikolog biar aku bisa mengontrol diriku jauh lebih baik lagi, biar bisa ngobatin diri sendiri tanpa orang lain tahu.</p>
+<p>Oh ya sebenarnya ada hal lain yang buat aku jadi aya yang begini, tapi aku gak bakalan bisa cerita itu ke siapa pun mau sedekat apa aku sama orang itu, tapi aku bakalan kasih video di bawah ini kamu bisa lihat VT nya sesuai sama yang aku rasain pas kecil ☺ </p>
+                </div>
+
+                <!-- Tombol VT -->
+                <div class="mt-2 mb-6 p-5 bg-[#fbfdfb] rounded-2xl border border-[#cbdccb] text-center">
+                    <p class="font-bold text-sm text-[#4c634c] mb-3">🎬 Tonton Video Tiktok Berikut:</p>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <a href="https://vt.tiktok.com/ZSxANkkF2/" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center justify-center px-5 py-2.5 bg-[#5c7a5c] text-white text-xs font-bold rounded-xl shadow-sm hover:bg-[#4a634a] active:scale-95 transition duration-150">
+                            🎥 Tonton Video 1
+                        </a>
+                        <a href="https://vt.tiktok.com/ZSxANrbmN/" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center justify-center px-5 py-2.5 bg-[#5c7a5c] text-white text-xs font-bold rounded-xl shadow-sm hover:bg-[#4a634a] active:scale-95 transition duration-150">
+                            🎥 Tonton Video 2
+                        </a>
+                    </div>
+                </div>
+
+                <div class="diary-text text-[#2c352c] leading-relaxed text-sm sm:text-base tracking-wide text-justify">
+                    <p class="border-t border-[#cbdccb]/40 pt-4">Udahlah capek ku ngetik intinya apa pun yang kamu baca disini cukup kamu yang yang tau pliss jangan kamu billing ke orang aku mohon banget aku udah ngasih kepercayaan yang besar ke kamu, aku ngerasa kamu cukup mampu untuk nge rahasiakan ini kan, aku juga udah nurunin harga diri yang aku jaga selama ini, maksudnya untuk terlihat kuat dan baik-baik aja. Jarang-jarang aku ngasih kepercayaan ke orang, jadi tolong dijaga ya💛💛</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let enteredPin = "";
+        const correctPin = "3002";
+
+        // Live Clock
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            document.getElementById('live-clock').innerText = hours + ':' + minutes + ' ' + ampm;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Toggle Hint Box
+        function toggleHint() {
+            const hintBox = document.getElementById('hint-box');
+            if (hintBox.classList.contains('hidden')) {
+                hintBox.classList.remove('hidden');
+                setTimeout(() => { hintBox.classList.add('hidden'); }, 5000); // Muncul selama 5 detik
+            } else {
+                hintBox.classList.add('hidden');
+            }
+        }
+
+        // Pin Screen
+        function updateDots() {
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i <= enteredPin.length) {
+                    dot.classList.remove('bg-transparent');
+                    dot.classList.add('bg-[#5c7a5c]', 'scale-110');
+                } else {
+                    dot.classList.add('bg-transparent');
+                    dot.classList.remove('bg-[#5c7a5c]', 'scale-110');
+                }
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('page-pin').classList.contains('active')) {
+                if (e.key >= '0' && e.key <= '9') pressNum(e.key);
+                if (e.key === 'Backspace') backspace();
+            }
+        });
+
+        function pressNum(num) {
+            document.getElementById('hint-box').classList.add('hidden');
+            if (enteredPin.length < 4) {
+                enteredPin += num;
+                updateDots();
+                hideError();
+                if (enteredPin.length === 4) {
+                    setTimeout(checkPin, 200);
+                }
+            }
+        }
+
+        function backspace() {
+            if (enteredPin.length > 0) {
+                enteredPin = enteredPin.slice(0, -1);
+                updateDots();
+                hideError();
+            }
+        }
+
+        function clearPin() {
+            enteredPin = "";
+            updateDots();
+            hideError();
+        }
+
+        function showError() {
+            const err = document.getElementById('error-msg');
+            err.style.opacity = '1';
+        }
+
+        function hideError() {
+            const err = document.getElementById('error-msg');
+            err.style.opacity = '0';
+        }
+
+        function checkPin() {
+            if (enteredPin === correctPin) {
+                document.getElementById('page-pin').classList.remove('active');
+                document.getElementById('page-desktop').classList.add('active');
+                clearPin();
+            } else {
+                showError();
+                setTimeout(clearPin, 600);
+            }
+        }
+
+        // Desktop Interactivity
+        function openSystemDialog(title, msg) {
+            document.getElementById('dialog-title').innerText = title;
+            document.getElementById('dialog-message').innerText = msg;
+            document.getElementById('system-dialog').classList.remove('hidden');
+        }
+
+        document.getElementById('app-wrapper').addEventListener('click', function(e) {
+            const dialog = document.getElementById('system-dialog');
+            if (!dialog.classList.contains('hidden') && !dialog.contains(e.target) && !e.target.closest('[onclick^="openSystemDialog"]')) {
+                closeSystemDialog();
+            }
+        });
+
+        function closeSystemDialog() {
+            document.getElementById('system-dialog').classList.add('hidden');
+        }
+
+        // Navigation
+        function openDiary() {
+            document.getElementById('page-desktop').classList.remove('active');
+            document.getElementById('page-diary').classList.add('active');
+        }
+
+        function closeDiary() {
+            document.getElementById('page-diary').classList.remove('active');
+            document.getElementById('page-desktop').classList.add('active');
+        }
+
+        function lockSystem() {
+            document.getElementById('page-desktop').classList.remove('active');
+            document.getElementById('page-pin').classList.add('active');
+        }
+
+        // Anti-Copy Logic
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && (e.key === 'c' || e.key === 'x' || e.key === 'u' || e.key === 's' || e.key === 'C' || e.key === 'X')) {
+                e.preventDefault();
+                return false;
+            }
+            if ((e.ctrlKey && e.shiftKey && e.key === 'I') || e.key === 'F12') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        document.addEventListener('dragstart', function(e) { e.preventDefault(); });
+    </script>
+</body>
+</html>
