@@ -25,8 +25,8 @@
 
         /* Navigasi Page */
         .page { 
-            display: none;
-            width: 100vw;
+            display: none; 
+            width: 100vw; 
         }
         .page.active { 
             display: flex; 
@@ -46,6 +46,13 @@
 </head>
 <body class="select-none overflow-y-auto" oncontextmenu="return false;">
 
+    <!-- TAMPILAN JIKA SUDAH KEDALUWARSA (Otomatis muncul setelah 27 Mei 2026) -->
+    <div id="expired-screen" class="hidden fixed inset-0 bg-[#1e231f] flex flex-col items-center justify-center text-center p-6 z-[9999]">
+        <div class="text-5xl mb-4">⌛</div>
+        <h1 class="text-xl font-bold text-[#e2ede4] mb-2">Akses Telah Kedaluwarsa</h1>
+        <p class="text-sm text-stone-400 max-w-xs leading-relaxed">Website diary digital ini sudah tidak dapat diakses lagi demi menjaga privasi.</p>
+    </div>
+
     <div id="app-wrapper" class="w-full h-full flex flex-col">
 
         <!-- PAGE 1: SMARTPHONE PIN LOCKSCREEN -->
@@ -62,7 +69,7 @@
                 <h2 class="text-2xl font-bold text-[#4c634c] mb-1">Akses Terkunci</h2>
                 <p class="text-xs text-[#738a73] font-medium tracking-wider uppercase mb-4">Masukkan PIN Anda</p>
                 
-                <!-- Pop-up Hint Box (Ditambahkan petunjuk formatnya) -->
+                <!-- Pop-up Hint Box -->
                 <div id="hint-box" class="hidden absolute top-16 left-1/2 transform -translate-x-1/2 w-[90%] bg-amber-50 px-4 py-3 rounded-2xl text-xs text-amber-800 font-medium border border-amber-200 shadow-lg text-center z-50">
                     💡 <span class="italic">Petunjuk Rahasia: "crush aku yang sekarang tapi di balik (format: 4 angka PIN)"</span>
                 </div>
@@ -195,7 +202,7 @@
                     <span class="text-xs font-bold text-[#738a73] tracking-widest uppercase">My Diary</span>
                 </div>
 
-                <!-- Isi Isi Diary Lengkap -->
+                <!-- Isi Diary Lengkap -->
                 <div class="diary-text text-[#2c352c] leading-relaxed text-sm sm:text-base tracking-wide text-justify pb-4 space-y-4">
 <p class="font-bold text-lg text-[#3c513c]">Haiii👋</p>
 <p>Yuyur nyesalll billing iya soal ngasih tau ini🥲</p>
@@ -241,6 +248,31 @@
         let enteredPin = "";
         const correctPin = "3002";
 
+        // ================= LOGIKA KEDALUWARSA (BATAS: 27 MEI 2026) =================
+        function checkExpiration() {
+            const currentDate = new Date();
+            // Mengeset batas waktu: 28 Mei 2026 jam 00:00:00 (Selesai tanggal 27)
+            const expiryDate = new Date(2026, 4, 28, 0, 0, 0); // Bulan JS dimulai dari 0 (4 = Mei)
+
+            if (currentDate >= expiryDate) {
+                // Sembunyikan seluruh isi aplikasi dan munculkan layar kedaluwarsa
+                document.getElementById('app-wrapper').style.display = 'none';
+                document.getElementById('expired-screen').classList.remove('hidden');
+                return true;
+            }
+            return false;
+        }
+
+        // Jalankan cek kedaluwarsa pertama kali saat dimuat
+        if (!checkExpiration()) {
+            // Jika belum kedaluwarsa, jalankan sistem jam reguler
+            setInterval(() => {
+                updateClock();
+                checkExpiration(); // Selalu cek secara berkala jika web dibiarkan terbuka
+            }, 1000);
+            updateClock();
+        }
+
         // Live Clock
         function updateClock() {
             const now = new Date();
@@ -252,15 +284,13 @@
             minutes = minutes < 10 ? '0'+minutes : minutes;
             document.getElementById('live-clock').innerText = hours + ':' + minutes + ' ' + ampm;
         }
-        setInterval(updateClock, 1000);
-        updateClock();
 
         // Toggle Hint Box
         function toggleHint() {
             const hintBox = document.getElementById('hint-box');
             if (hintBox.classList.contains('hidden')) {
                 hintBox.classList.remove('hidden');
-                setTimeout(() => { hintBox.classList.add('hidden'); }, 5000); // Muncul selama 5 detik
+                setTimeout(() => { hintBox.classList.add('hidden'); }, 5000);
             } else {
                 hintBox.classList.add('hidden');
             }
